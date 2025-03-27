@@ -1,67 +1,99 @@
-# Bob Rust Interview Challenge
+# BOB Rust Challenge
 
-This is a 1-hour coding challenge designed to evaluate Rust programming skills, particularly focusing on async programming, concurrency, and system design.
+A distributed bulletin board system implementation challenge in Rust.
 
-## Challenge Overview
+## Overview
 
-You will implement a distributed key-value store with the following requirements:
+This challenge involves implementing a distributed bulletin board system with the following key features:
 
-1. **Core Features** (45 minutes):
-   - Implement the `Store` trait in `src/store.rs`
-   - Complete the `InMemoryStore` implementation with concurrent access
-   - Implement signature verification in `src/crypto.rs`
-   - Write tests for your implementation
+- Message posting with ECDSA signatures
+- Message retrieval by public key
+- Network communication using TCP
+- Concurrent request handling
+- In-memory message storage
 
-2. **Technical Requirements**:
-   - Use async/await for all I/O operations
-   - Use RwLock for concurrent access
-   - Implement proper error handling
-   - Write clean, idiomatic Rust code
+## Requirements
 
-3. **Bonus Challenge** (15 minutes if time permits):
-   - Implement the network server in `src/server.rs`
-   - Handle client connections and requests
-   - Verify signatures for write operations
+### 1. Cryptographic Signatures
+
+Implement a signature scheme in `src/crypto.rs`:
+- Use ECDSA for message signing
+- Support message verification with public keys
+- Handle errors appropriately
+- Include comprehensive tests
+
+### 2. Message Storage
+
+Implement a storage interface in `src/store.rs`:
+- Store messages by public key
+- Support concurrent access
+- Handle errors appropriately
+- Include comprehensive tests
+
+### 3. Network Server
+
+Implement a TCP server in `src/server.rs`:
+- Handle multiple concurrent connections
+- Process post and get requests
+- Verify signatures for post operations
+- Return appropriate responses
+- Handle errors appropriately
+- Include comprehensive tests
 
 ## Project Structure
 
-- `src/lib.rs`: Core library implementation and re-exports
-- `src/error.rs`: Custom error types (TODO: implement error handling)
-- `src/store.rs`: Key-value store implementation (TODO: implement Store trait)
-- `src/crypto.rs`: Signature verification (TODO: implement signature scheme)
-- `src/server.rs`: Network server implementation (Bonus)
-- `tests/`: Test files
+```
+src/
+├── crypto.rs    # Cryptographic signature implementation
+├── error.rs     # Error types
+├── lib.rs       # Library exports
+├── server.rs    # Network server implementation
+└── store.rs     # Message storage implementation
+```
+
+## Implementation Details
+
+### Message Posting
+- Messages must be signed with a private key
+- Signatures must be verified using the corresponding public key
+- Messages are stored and indexed by public key
+
+### Message Retrieval
+- Messages can be retrieved using a public key
+- Returns all messages posted with that public key
+- No signature verification needed for retrieval
+
+### Network Protocol
+- JSON-based request/response format
+- TCP-based communication
+- Support for concurrent connections
 
 ## Getting Started
 
-1. Review the code structure and TODOs in each file
+1. Clone the repository
 2. Implement the required functionality
-3. Add tests for your implementation
-4. If time permits, implement the bonus challenge
+3. Run the tests: `cargo test`
+4. Run the server: `cargo run`
+
+## Testing
+
+The project includes comprehensive tests for each component:
+- Cryptographic signature tests
+- Storage interface tests
+- Network server tests
+- Integration tests
+
+Run the tests with:
+```bash
+cargo test
+```
 
 ## Evaluation Criteria
 
-Your implementation will be evaluated on:
-
-1. Code quality and idiomatic Rust usage
-2. Proper handling of concurrency and async operations
-3. Error handling and type safety
-4. Test coverage and quality
-5. Documentation and comments
-
-## Tips
-
-- Start with the core functionality in `store.rs`
-- Write tests as you implement features
-- Use the provided dependencies effectively
-- Consider edge cases and error conditions
-- Document your design decisions
-
-## Dependencies
-
-- tokio: Async runtime
-- serde: Serialization
-- thiserror: Error handling
-- sha2: Cryptographic hashing
-
-Good luck! 
+The implementation will be evaluated based on:
+- Correctness of the cryptographic implementation
+- Proper error handling
+- Code organization and readability
+- Test coverage
+- Performance with concurrent connections
+- Documentation quality 

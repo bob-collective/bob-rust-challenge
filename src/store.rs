@@ -1,25 +1,12 @@
-use std::sync::Arc;
-use tokio::sync::RwLock;
-use std::collections::HashMap;
-use serde::{Serialize, Deserialize};
-use crate::error::{Result, StoreError};
-
-// TODO: Implement a struct to represent a signed value
-// Requirements:
-// - Include the actual value
-// - Include a signature
-// - Implement Serialize/Deserialize
-#[derive(Debug, Serialize, Deserialize)]
-pub struct SignedValue {
-    // Add your fields here
-}
+use crate::error::Result;
+use async_trait::async_trait;
 
 // TODO: Implement the store trait
 // Requirements:
 // - All methods should be async
 // - Handle concurrent access safely
 // - Verify signatures for write operations
-#[async_trait::async_trait]
+#[async_trait]
 pub trait Store: Send + Sync {
     async fn get(&self, key: &str) -> Result<Option<Vec<u8>>>;
     async fn put(&self, key: String, value: Vec<u8>) -> Result<()>;
@@ -42,7 +29,7 @@ impl InMemoryStore {
     }
 }
 
-#[async_trait::async_trait]
+#[async_trait]
 impl Store for InMemoryStore {
     async fn get(&self, key: &str) -> Result<Option<Vec<u8>>> {
         // TODO: Implement get operation
@@ -70,9 +57,7 @@ impl Store for InMemoryStore {
 
 #[cfg(test)]
 mod tests {
-    use super::*;
-    use tokio_test::block_on;
-
+    use super::InMemoryStore;
     // TODO: Implement tests for:
     // - Basic CRUD operations
     // - Concurrent access
@@ -83,4 +68,4 @@ mod tests {
         // TODO: Implement test
         unimplemented!()
     }
-} 
+}

@@ -1,43 +1,39 @@
 use crate::crypto::Signature;
 use crate::{Result, Store};
 use serde::{Deserialize, Serialize};
-use tokio::io::{AsyncReadExt, AsyncWriteExt};
-use tokio::net::{TcpListener, TcpStream};
+use tokio::net::TcpStream;
 
-// TODO: Implement request/response types
+// TODO: Implement request/response types for bulletin board
 // Requirements:
-// - Support all store operations (get/put/delete)
-// - Include necessary fields for signatures
+// - Support posting messages with signatures
+// - Support retrieving messages by public key
+// - Include necessary fields for signatures and public keys
 // - Implement Serialize/Deserialize
 #[derive(Debug, Serialize, Deserialize)]
 pub enum Request {
+    Post {
+        message: Vec<u8>,
+        signature: Signature,
+        public_key: Vec<u8>,
+    },
     Get {
-        key: String,
-    },
-    Put {
-        key: String,
-        value: Vec<u8>,
-        signature: Signature,
-    },
-    Delete {
-        key: String,
-        signature: Signature,
+        public_key: Vec<u8>,
     },
 }
 
 #[derive(Debug, Serialize, Deserialize)]
 pub enum Response {
-    Get { value: Option<Vec<u8>> },
-    Put,
-    Delete,
+    Post,
+    Get { messages: Vec<Vec<u8>> },
     Error { message: String },
 }
 
-// TODO: Implement the server
+// TODO: Implement the bulletin board server
 // Requirements:
 // - Handle multiple concurrent connections
 // - Process requests and return responses
-// - Verify signatures for write operations
+// - Verify signatures for post operations
+// - Store messages by public key
 pub struct Server {
     store: Box<dyn Store>,
 }
@@ -70,8 +66,8 @@ impl Server {
 
     // TODO: Implement request processing
     // Requirements:
-    // - Handle all request types
-    // - Verify signatures where needed
+    // - Handle post requests with signature verification
+    // - Handle get requests to retrieve messages by public key
     // - Return appropriate responses
     async fn process_request(&self, request: Request) -> Result<Response> {
         // TODO: Implement request processing
@@ -83,9 +79,10 @@ impl Server {
 mod tests {
     use super::*;
     use crate::InMemoryStore;
+    use tokio::io::{AsyncReadExt, AsyncWriteExt};
 
     #[tokio::test]
-    async fn test_server_with_signed_operations() -> Result<()> {
+    async fn test_bulletin_board_operations() -> Result<()> {
         // Create a store and server
         let store = Box::new(InMemoryStore::new());
         let server = Server::new(store);
@@ -100,15 +97,16 @@ mod tests {
         // Create a test client
         let mut stream = TcpStream::connect(format!("127.0.0.1:{}", port)).await?;
 
-        // Test put operation with signature
-        let key = "test_key".to_string();
-        let value = vec![1, 2, 3];
-        let signature = Signature::sign(&value, b"test_key")?;
+        // Test post operation with signature
+        let message = b"Hello, Bulletin Board!";
+        let public_key = b"test_public_key";
+        let private_key = b"test_private_key";
+        let signature = Signature::sign(message, private_key)?;
 
-        let request = Request::Put {
-            key: key.clone(),
-            value: value.clone(),
+        let request = Request::Post {
+            message: message.to_vec(),
             signature,
+            public_key: public_key.to_vec(),
         };
 
         // Send request
@@ -122,13 +120,15 @@ mod tests {
 
         // Verify response
         match response {
-            Response::Put => (), // Success
+            Response::Post => (), // Success
             Response::Error { message } => panic!("Unexpected error: {}", message),
             _ => panic!("Unexpected response type"),
         }
 
         // Test get operation
-        let request = Request::Get { key: key.clone() };
+        let request = Request::Get {
+            public_key: public_key.to_vec(),
+        };
         let request_json = serde_json::to_string(&request)?;
         stream.write_all(request_json.as_bytes()).await?;
 
@@ -136,8 +136,10 @@ mod tests {
         let response: Response = serde_json::from_slice(&buffer[..n])?;
 
         match response {
-            Response::Get { value: Some(v) } => assert_eq!(v, value),
-            Response::Get { value: None } => panic!("Expected value, got None"),
+            Response::Get { messages } => {
+                assert_eq!(messages.len(), 1);
+                assert_eq!(messages[0], message);
+            }
             Response::Error { message } => panic!("Unexpected error: {}", message),
             _ => panic!("Unexpected response type"),
         }

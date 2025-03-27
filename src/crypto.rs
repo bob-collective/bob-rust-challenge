@@ -1,11 +1,10 @@
-use crate::error::{Result, StoreError};
+use crate::error::Result;
 use serde::{Deserialize, Serialize};
-use sha2::{Digest, Sha256};
 
 // TODO: Implement a simple signature scheme
 // Requirements:
-// - Sign messages using SHA256
-// - Verify signatures
+// - Sign messages with private key
+// - Verify signatures against public key
 // - Handle errors appropriately
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct Signature {
@@ -18,28 +17,26 @@ pub struct Signature {
 impl Signature {
     // TODO: Implement signature creation
     // Requirements:
-    // - Take a message and key
+    // - Take a message and private key
     // - Return a signature
-    pub fn sign(_message: &[u8], _key: &[u8]) -> Result<Self> {
+    pub fn sign(_message: &[u8], _private_key: &[u8]) -> Result<Self> {
         unimplemented!()
     }
 
     // TODO: Implement signature verification
     // Requirements:
-    // - Take a message and key
-    // - Return true if signature is valid
-    pub fn verify(&self, _message: &[u8], _key: &[u8]) -> Result<bool> {
+    // - Take a message and public key
+    // - Return true if signature is valid for the message
+    pub fn verify(&self, _message: &[u8], _public_key: &[u8]) -> Result<bool> {
         unimplemented!()
     }
 }
 
 #[cfg(test)]
 mod tests {
-    use super::*;
-
     // TODO: Implement tests for:
-    // - Signature creation
-    // - Signature verification
+    // - Signature creation with private key
+    // - Signature verification with public key
     // - Invalid signatures
     #[test]
     fn test_signature_verification() {
