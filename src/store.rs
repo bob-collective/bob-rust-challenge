@@ -39,7 +39,6 @@ impl Store for InMemoryStore {
     async fn put(&self, key: String, value: Vec<u8>) -> Result<()> {
         // TODO: Implement put operation
         // Requirements:
-        // - Create a signed value
         // - Store it in the map
         // - Handle concurrent access
         unimplemented!()

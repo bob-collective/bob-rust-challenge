@@ -6,7 +6,7 @@ A distributed bulletin board system implementation challenge in Rust.
 
 This challenge involves implementing a distributed bulletin board system with the following key features:
 
-- Message posting with ECDSA signatures
+- Message posting with signatures
 - Message retrieval by public key
 - Network communication using TCP
 - Concurrent request handling
@@ -17,7 +17,7 @@ This challenge involves implementing a distributed bulletin board system with th
 ### 1. Cryptographic Signatures
 
 Implement a signature scheme in `src/crypto.rs`:
-- Use ECDSA for message signing
+- Implement message signing
 - Support message verification with public keys
 - Handle errors appropriately
 - Include comprehensive tests
