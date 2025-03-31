@@ -16,7 +16,7 @@ pub trait Store: Send + Sync {
 // TODO: Implement the in-memory store
 // Requirements:
 // - Use RwLock for concurrent access
-// - Store values with their signatures
+// - Store values
 // - Handle errors appropriately
 pub struct InMemoryStore {
     // Add your fields here
